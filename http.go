@@ -33,7 +33,7 @@ type system struct {
 }
 
 type getSysInfo struct {
-	DeviceInfo listedDeviceInfo `json:"get_sysinfo,omitempty"`
+	DeviceInfo DeviceInfo `json:"get_sysinfo,omitempty"`
 }
 
 type listedDeviceInfo struct {
@@ -52,46 +52,6 @@ type listedDeviceInfo struct {
 	OemID        string `json:"oemId,omitempty"`
 	DeviceID     string `json:"deviceId,omitempty"`
 	DeviceHwVer  string `json:"deviceHwVer,omitempty"`
-}
-
-func (l listedDeviceInfo) toDeviceInfo() DeviceInfo {
-	return DeviceInfo{
-		FwID:       l.FwVer,
-		DeviceName: l.DeviceName,
-		Alias:      l.Alias,
-		Type:       l.DeviceType,
-		Model:      l.DeviceModel,
-		Mac:        l.DeviceMac,
-		HwID:       l.HwID,
-		OemID:      l.OemID,
-		DeviceID:   l.DeviceID,
-		HwVer:      l.DeviceHwVer,
-	}
-}
-
-// DeviceInfo Get all the information about a device
-type DeviceInfo struct {
-	SwVer      string  `json:"sw_ver,omitempty"`
-	HwVer      string  `json:"hw_ver,omitempty"`
-	Type       string  `json:"type,omitempty"`
-	Model      string  `json:"model,omitempty"`
-	Mac        string  `json:"mac,omitempty"`
-	DeviceID   string  `json:"deviceId,omitempty"`
-	HwID       string  `json:"hwId,omitempty"`
-	FwID       string  `json:"fwId,omitempty"`
-	OemID      string  `json:"oemId,omitempty"`
-	Alias      string  `json:"alias,omitempty"`
-	DeviceName string  `json:"dev_name,omitempty"`
-	IconHash   string  `json:"icon_hash,omitempty"`
-	RelayState int     `json:"relay_state,omitempty"`
-	OnTime     int     `json:"on_time,omitempty"`
-	ActiveMode string  `json:"active_mode,omitempty"`
-	Feature    string  `json:"feature,omitempty"`
-	Updating   int     `json:"updating,omitempty"`
-	Rssi       int     `json:"rssi,omitempty"`
-	LedOff     int     `json:"led_off,omitempty"`
-	Latitude   float64 `json:"latitude,omitempty"`
-	Longitude  float64 `json:"longitude,omitempty"`
 }
 
 type request struct {
