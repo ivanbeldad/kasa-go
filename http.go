@@ -9,7 +9,8 @@ import (
 )
 
 const (
-	codeNoError = 0
+	codeNoError       = 0
+	expiredTokenError = "Token expired"
 )
 
 type reponseBody struct {
@@ -27,7 +28,7 @@ type result struct {
 	Token          string       `json:"token,omitempty"`
 }
 
-// DeviceInfo ...
+// DeviceInfo Get all the information about a device
 type DeviceInfo struct {
 	FwVer        string `json:"fwVer,omitempty"`
 	DeviceName   string `json:"deviceName,omitempty"`
@@ -48,8 +49,12 @@ type DeviceInfo struct {
 
 type request struct {
 	URL         string
-	Token       string
 	RequestBody requestBody
+}
+
+type authRequest struct {
+	Request request
+	Auth    auth
 }
 
 type requestBody struct {
@@ -66,11 +71,8 @@ type params struct {
 	RequestData   string `json:"requestData,omitempty"`
 }
 
-// Exec ...
-func (r request) Exec() (res result, err error) {
-	if r.Token != "" {
-		r.URL = r.URL + "?token=" + r.Token
-	}
+func (r request) execute() (result, error) {
+	res := result{}
 	reqBodyJSON, err := json.MarshalIndent(&r.RequestBody, "", "  ")
 	if err != nil {
 		return res, err
@@ -79,18 +81,47 @@ func (r request) Exec() (res result, err error) {
 	if err != nil {
 		return res, err
 	}
-	defer response.Body.Close()
-	bodyBytes, err := ioutil.ReadAll(response.Body)
+	return parseResponse(response)
+}
+
+func (r authRequest) execute() (result, error) {
+	var res result
+	var err error
+	if r.Auth.Token == "" {
+		err = r.Auth.generateToken()
+		if err != nil {
+			return res, err
+		}
+	}
+	r.Request.URL = r.Request.URL + "?token=" + r.Auth.Token
+	res, err = r.Request.execute()
 	if err != nil {
-		return res, err
+		if err.Error() == expiredTokenError {
+			err = r.Auth.generateToken()
+			if err != nil {
+				return res, err
+			}
+			r.Request.URL = r.Request.URL + "?token=" + r.Auth.Token
+			return r.Request.execute()
+		}
+	}
+	return res, err
+}
+
+func parseResponse(res *http.Response) (result, error) {
+	r := result{}
+	defer res.Body.Close()
+	bodyBytes, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return r, err
 	}
 	rb := reponseBody{}
 	err = json.Unmarshal(bodyBytes, &rb)
 	if rb.ErrorCode != codeNoError {
 		if rb.ErrorMessage == "" {
-			return res, fmt.Errorf("unknow API error")
+			return r, fmt.Errorf("unknow API error")
 		}
-		return res, fmt.Errorf("%s", rb.ErrorMessage)
+		return r, fmt.Errorf("%s", rb.ErrorMessage)
 	}
-	return rb.Result, err
+	return rb.Result, nil
 }
