@@ -29,7 +29,7 @@ type DeviceInfo struct {
 
 func (d *DeviceInfo) fromListedDeviceInfo(l listedDeviceInfo) {
 	*d = DeviceInfo{
-		FwID:       l.FwVer,
+		FwID:       l.FwID,
 		DeviceName: l.DeviceName,
 		Alias:      l.Alias,
 		Type:       l.DeviceType,

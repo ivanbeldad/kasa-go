@@ -28,14 +28,6 @@ type result struct {
 	Token          string             `json:"token,omitempty"`
 }
 
-type system struct {
-	GetSysInfo getSysInfo `json:"system,omitempty"`
-}
-
-type getSysInfo struct {
-	DeviceInfo DeviceInfo `json:"get_sysinfo,omitempty"`
-}
-
 type listedDeviceInfo struct {
 	FwVer        string `json:"fwVer,omitempty"`
 	DeviceName   string `json:"deviceName,omitempty"`
