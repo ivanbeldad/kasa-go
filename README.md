@@ -33,7 +33,7 @@ go get github.com/ivandelabeldad/kasa-go
 
 ## Example
 
-```
+```go
 api, err := kasa.Connect("tplink@mail.com", "myStrongPassword")
 if err != nil {
   log.Fatal(err)
