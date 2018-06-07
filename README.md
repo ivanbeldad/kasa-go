@@ -1,5 +1,8 @@
 # Kasa Go
 
+[![Version](https://img.shields.io/github/tag/ivandelabeldad/kasa-go.svg)](https://github.com/ivandelabeldad/kasa-go)
+[![License](https://img.shields.io/badge/license-MIT-orange.svg)](https://github.com/ivandelabeldad/kasa-go/blob/master/LICENSE)
+
 Go library to remotely control TP-Link devices using their cloud web service so they can be
 controlled from outside the network.
 
