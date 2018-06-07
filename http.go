@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 )
 
 const (
@@ -13,10 +14,22 @@ const (
 	expiredTokenError = "Token expired"
 )
 
+// AP Access Point near the device
+type AP struct {
+	SSID    string `json:"ssid,omitempty"`
+	KeyType int    `json:"key_type,omitempty"`
+}
+
+func (ap AP) String() (s string) {
+	s += fmt.Sprintf("SSID:     %s\n", ap.SSID)
+	s += fmt.Sprintf("Key Type: %"+strconv.Itoa(len(ap.SSID))+"d\n", ap.KeyType)
+	return s
+}
+
 type reponseBody struct {
-	ErrorCode    int    `json:"error_code"`
-	Result       result `json:"result"`
-	ErrorMessage string `json:"msg"`
+	ErrorCode    int    `json:"error_code,omitempty"`
+	Result       result `json:"result,omitempty"`
+	ErrorMessage string `json:"msg,omitempty"`
 }
 
 type result struct {
