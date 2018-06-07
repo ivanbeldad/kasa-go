@@ -3,32 +3,30 @@ package kasa
 import (
 	"encoding/json"
 	"log"
+	"regexp"
+	"strings"
 )
 
-// system info 				{"system":{"get_sysinfo":{}}}
-// get token
-// get devices
-// switch on / off			{“system":{"set_relay_state":{"state":1}}}
-// reboot					{"system":{"reboot":{"delay":1}}}
 // get timers
-// get ssids
 // change wifi network
 // factory reset 			{"system":{"reset":{"delay":1}}}
 
-// HS100 Allow to interact with the SmartPlug HS100
-type HS100 interface {
+// SmartPlug Allow to interact with either the SmartPlug HS100 and HS110
+type SmartPlug interface {
 	GetAlias() string
 	GetInfo() (DeviceInfo, error)
-	TurnOn()
-	TurnOff()
-	SwitchOnOff()
-	Reboot()
+	TurnOn() error
+	TurnOff() error
+	SwitchOnOff() error
+	Reboot() error
+	ScanAPs() ([]AP, error)
 }
 
+// HS100 Allow to interact with the SmartPlug HS100
+type HS100 SmartPlug
+
 // HS110 Allow to interact with the SmartPlug HS110
-type HS110 interface {
-	HS100
-}
+type HS110 SmartPlug
 
 type smartPlug struct {
 	DeviceID string
@@ -42,46 +40,102 @@ func (s smartPlug) GetAlias() string {
 
 func (s smartPlug) GetInfo() (DeviceInfo, error) {
 	var deviceInfo DeviceInfo
-	res, err := authRequest{
-		Auth: s.Auth,
-		Request: request{
-			URL: cloudURL,
-			RequestBody: requestBody{
-				Method: methodPassthrough,
-				Params: params{
-					DeviceID:    s.DeviceID,
-					RequestData: "{\"system\": {\"get_sysinfo\": {}}}",
-				},
-			},
+	res, err := s.getAuthRequest(requestBody{
+		Method: methodPassthrough,
+		Params: params{
+			DeviceID:    s.DeviceID,
+			RequestData: "{\"system\": {\"get_sysinfo\": {}}}",
 		},
-	}.execute()
+	}).execute()
 	if err != nil {
 		return deviceInfo, err
 	}
-	var sys system
-	err = json.Unmarshal([]byte(res.ResponseData), &sys)
+	res.ResponseData = strings.Replace(res.ResponseData, "{\"system\":{\"get_sysinfo\":", "", 1)
+	res.ResponseData = strings.Replace(res.ResponseData, "}}", "", 1)
+	err = json.Unmarshal([]byte(res.ResponseData), &deviceInfo)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return deviceInfo, err
+	return deviceInfo, nil
 }
 
-// TurnOn ...
-func (s smartPlug) TurnOn() {
-
+func (s smartPlug) TurnOn() error {
+	_, err := s.getAuthRequest(requestBody{
+		Method: methodPassthrough,
+		Params: params{
+			DeviceID:    s.DeviceID,
+			RequestData: "{\"system\": {\"set_relay_state\": {\"state\": 1}}}",
+		},
+	}).execute()
+	return err
 }
 
-// TurnOff ...
-func (s smartPlug) TurnOff() {
-
+func (s smartPlug) TurnOff() error {
+	_, err := s.getAuthRequest(requestBody{
+		Method: methodPassthrough,
+		Params: params{
+			DeviceID:    s.DeviceID,
+			RequestData: "{\"system\": {\"set_relay_state\": {\"state\": 0}}}",
+		},
+	}).execute()
+	return err
 }
 
-// SwitchOnOff ...
-func (s smartPlug) SwitchOnOff() {
-
+func (s smartPlug) SwitchOnOff() error {
+	info, err := s.GetInfo()
+	if err != nil {
+		return err
+	}
+	if info.RelayState == 1 {
+		return s.TurnOff()
+	}
+	return s.TurnOn()
 }
 
-// Reboot ...
-func (s smartPlug) Reboot() {
+func (s smartPlug) Reboot() error {
+	_, err := s.getAuthRequest(requestBody{
+		Method: methodPassthrough,
+		Params: params{
+			DeviceID:    s.DeviceID,
+			RequestData: "{\"system\":{\"reboot\":{\"delay\":1}}}",
+		},
+	}).execute()
+	if err.Error() == "Request timeout" {
+		err = nil
+	}
+	return err
+}
 
+func (s smartPlug) ScanAPs() ([]AP, error) {
+	aps := make([]AP, 0)
+	res, err := s.getAuthRequest(requestBody{
+		Method: methodPassthrough,
+		Params: params{
+			DeviceID:    s.DeviceID,
+			RequestData: "{\"netif\":{\"get_scaninfo\":{\"refresh\":1}}}",
+		},
+	}).execute()
+	if err != nil {
+		return nil, err
+	}
+	re := regexp.MustCompile(`.*ap_list":(\[.*\])`)
+	data := re.FindStringSubmatch(res.ResponseData)
+	if len(data) < 2 {
+		return aps, nil
+	}
+	err = json.Unmarshal([]byte(data[1]), &aps)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return aps, nil
+}
+
+func (s smartPlug) getAuthRequest(reqBody requestBody) authRequest {
+	return authRequest{
+		Auth: s.Auth,
+		Request: request{
+			URL:         cloudURL,
+			RequestBody: reqBody,
+		},
+	}
 }
