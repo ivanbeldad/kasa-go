@@ -28,6 +28,9 @@ type HS100 SmartPlug
 // HS110 Allow to interact with the SmartPlug HS110
 type HS110 SmartPlug
 
+// HS200 Allow to interact with the SmartPlug HS200
+type HS200 SmartPlug
+
 type smartPlug struct {
 	DeviceID string
 	Alias    string

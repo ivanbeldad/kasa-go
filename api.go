@@ -17,6 +17,7 @@ type API interface {
 	GetDevicesInfo() ([]DeviceInfo, error)
 	GetHS100(alias string) (HS100, error)
 	GetHS110(alias string) (HS110, error)
+	GetHS200(alias string) (HS200, error)
 }
 
 type api struct {
@@ -50,6 +51,21 @@ func (a api) GetHS100(alias string) (HS100, error) {
 		if device.Alias == alias {
 			hs100 = smartPlug{Alias: alias, Auth: a.Auth, DeviceID: device.DeviceID}
 			return hs100, nil
+		}
+	}
+	return smartPlug{}, fmt.Errorf("there is no device with alias %s", alias)
+}
+
+func (a api) GetHS200(alias string) (HS200, error) {
+	var hs200 HS200
+	devices, err := a.GetDevicesInfo()
+	if err != nil {
+		return hs200, err
+	}
+	for _, device := range devices {
+		if device.Alias == alias {
+			hs200 = smartPlug{Alias: alias, Auth: a.Auth, DeviceID: device.DeviceID}
+			return hs200, nil
 		}
 	}
 	return smartPlug{}, fmt.Errorf("there is no device with alias %s", alias)
