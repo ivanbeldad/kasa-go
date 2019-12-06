@@ -1,7 +1,7 @@
 # Kasa Go
 
-[![Version](https://img.shields.io/github/tag/ivandelabeldad/kasa-go.svg)](https://github.com/ivandelabeldad/kasa-go)
-[![License](https://img.shields.io/badge/license-MIT-orange.svg)](https://github.com/ivandelabeldad/kasa-go/blob/master/LICENSE)
+[![Version](https://img.shields.io/github/tag/ivanbeldad/kasa-go.svg)](https://github.com/ivanbeldad/kasa-go)
+[![License](https://img.shields.io/badge/license-MIT-orange.svg)](https://github.com/ivanbeldad/kasa-go/blob/master/LICENSE)
 
 Go library to remotely control TP-Link devices using their cloud web service so they can be
 controlled from outside the network.
@@ -9,7 +9,7 @@ controlled from outside the network.
 ## Installation
 
 ```
-go get github.com/ivandelabeldad/kasa-go
+go get github.com/ivanbeldad/kasa-go
 ```
 
 ## Devices Supported
@@ -52,4 +52,4 @@ fmt.Print("Living Room turned on successfully!")
 ## License
 
 Kasa Go is open-sourced software licensed under
-the [MIT license](https://github.com/ivandelabeldad/kasa-go/blob/master/LICENSE).
+the [MIT license](https://github.com/ivanbeldad/kasa-go/blob/master/LICENSE).
