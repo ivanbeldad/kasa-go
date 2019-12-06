@@ -56,22 +56,11 @@ func (a api) GetHS100(alias string) (HS100, error) {
 	return smartPlug{}, fmt.Errorf("there is no device with alias %s", alias)
 }
 
-func (a api) GetHS200(alias string) (HS200, error) {
-	var hs200 HS200
-	devices, err := a.GetDevicesInfo()
-	if err != nil {
-		return hs200, err
-	}
-	for _, device := range devices {
-		if device.Alias == alias {
-			hs200 = smartPlug{Alias: alias, Auth: a.Auth, DeviceID: device.DeviceID}
-			return hs200, nil
-		}
-	}
-	return smartPlug{}, fmt.Errorf("there is no device with alias %s", alias)
+func (a api) GetHS110(alias string) (HS110, error) {
+	return a.GetHS100(alias)
 }
 
-func (a api) GetHS110(alias string) (HS110, error) {
+func (a api) GetHS200(alias string) (HS200, error) {
 	return a.GetHS100(alias)
 }
 
