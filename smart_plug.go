@@ -25,6 +25,9 @@ type SmartPlug interface {
 // HS100 Allow to interact with the SmartPlug HS100
 type HS100 SmartPlug
 
+// HS103 Allow to interact with the SmartPlug HS103
+type HS103 SmartPlug
+
 // HS110 Allow to interact with the SmartPlug HS110
 type HS110 SmartPlug
 

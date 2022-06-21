@@ -16,6 +16,7 @@ const (
 type API interface {
 	GetDevicesInfo() ([]DeviceInfo, error)
 	GetHS100(alias string) (HS100, error)
+	GetHS103(alias string) (HS103, error)
 	GetHS110(alias string) (HS110, error)
 	GetHS200(alias string) (HS200, error)
 }
@@ -54,6 +55,10 @@ func (a api) GetHS100(alias string) (HS100, error) {
 		}
 	}
 	return smartPlug{}, fmt.Errorf("there is no device with alias %s", alias)
+}
+
+func (a api) GetHS103(alias string) (HS103, error) {
+	return a.GetHS100(alias)
 }
 
 func (a api) GetHS110(alias string) (HS110, error) {
