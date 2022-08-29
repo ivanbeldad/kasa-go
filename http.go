@@ -108,7 +108,7 @@ func (r authRequest) execute() (result, error) {
 	r.Request.URL = r.Request.URL + "?token=" + r.Auth.Token
 	res, err = r.Request.execute()
 	if err != nil {
-		if err.Error() == expiredTokenError {
+		if strings.TrimSpace(err.Error()) == expiredTokenError {
 			err = r.Auth.generateToken()
 			if err != nil {
 				return res, err
