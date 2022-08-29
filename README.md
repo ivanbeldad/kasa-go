@@ -17,6 +17,7 @@ go get github.com/ivanbeldad/kasa-go
 | Device | Type |
 | :--- | :--- |
 | HS100 | Smart Plug |
+| HS103 | Smart Plug |
 | HS110 | Smart Plug |
 | HS200 | Smart Light Switch |
 
