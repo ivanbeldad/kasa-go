@@ -44,6 +44,27 @@ func (s smartPlug) GetAlias() string {
 	return s.Alias
 }
 
+func (s smartPlug) GetEnergyUsage() (DeviceInfo, error) {
+	var deviceInfo DeviceInfo
+	res, err := s.getAuthRequest(requestBody{
+		Method: methodPassthrough,
+		Params: params{
+			DeviceID:    s.DeviceID,
+			RequestData: "{\"system\": {\"get_sysinfo\": {}}}",
+		},
+	}).execute()
+	if err != nil {
+		return deviceInfo, err
+	}
+	res.ResponseData = strings.Replace(res.ResponseData, "{\"system\":{\"get_sysinfo\":", "", 1)
+	res.ResponseData = strings.Replace(res.ResponseData, "}}", "", 1)
+	err = json.Unmarshal([]byte(res.ResponseData), &deviceInfo)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return deviceInfo, nil
+}
+
 func (s smartPlug) GetInfo() (DeviceInfo, error) {
 	var deviceInfo DeviceInfo
 	res, err := s.getAuthRequest(requestBody{
